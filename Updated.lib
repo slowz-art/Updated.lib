@@ -1452,30 +1452,33 @@ function HollowLib:CreateWindow(config)
 
                 -- GLOBAL KEY LISTENER - fires toggle when bound key is pressed
                 if syncToggle and id then
-                    -- InputBegan: key pressed
-                    UserInputService.InputBegan:Connect(function(input, gameProcessed)
-                        if gameProcessed or listening then return end
-                        if input.KeyCode == key and key ~= Enum.KeyCode.Unknown then
-                            -- Find the associated toggle
-                            local toggle = env.Toggles and env.Toggles[id]
-                            if toggle and toggle.SetValue then
-                                if mode == 'Toggle' then
-                                    toggle:SetValue(not toggle.Value)
-                                elseif mode == 'Hold' then
-                                    toggle:SetValue(true)
+                    local UIS = game:GetService("UserInputService")
+                    
+                    UIS.InputBegan:Connect(function(input, gpe)
+                        if listening then return end
+                        if input.UserInputType == Enum.UserInputType.Keyboard and input.KeyCode == key and key ~= Enum.KeyCode.Unknown then
+                            pcall(function()
+                                local toggle = env.Toggles[id]
+                                if toggle and toggle.SetValue then
+                                    if mode == 'Toggle' then
+                                        toggle:SetValue(not toggle.Value)
+                                    elseif mode == 'Hold' then
+                                        toggle:SetValue(true)
+                                    end
                                 end
-                            end
+                            end)
                         end
                     end)
 
-                    -- InputEnded: for Hold mode
                     if mode == 'Hold' then
-                        UserInputService.InputEnded:Connect(function(input, gameProcessed)
+                        UIS.InputEnded:Connect(function(input)
                             if input.KeyCode == key and key ~= Enum.KeyCode.Unknown then
-                                local toggle = env.Toggles and env.Toggles[id]
-                                if toggle and toggle.SetValue then
-                                    toggle:SetValue(false)
-                                end
+                                pcall(function()
+                                    local toggle = env.Toggles[id]
+                                    if toggle and toggle.SetValue then
+                                        toggle:SetValue(false)
+                                    end
+                                end)
                             end
                         end)
                     end
