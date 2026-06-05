@@ -1401,9 +1401,13 @@ function HollowLib:CreateWindow(config)
                 end
                 local callback = cfg.Callback or function() end
                 local listening = false
+                local syncToggle = cfg.SyncToggleState or false
+                local mode = cfg.Mode or 'Toggle'
+                local noUI = cfg.NoUI or false
 
                 local Row = MakeFrame(ItemContainer, UDim2.new(1,0,0,26), nil, Theme.ItemBG)
                 Row.BackgroundTransparency = 1
+                if noUI then Row.Visible = false Row.Size = UDim2.new(0,0,0,0) end
                 MakeCorner(Row, Radius.Item) MakePadding(Row, 0, 0, 4, 4)
 
                 local KBLabel = MakeLabel(Row, cfg.Text or id, 11, Theme.TextDim, Enum.Font.Gotham)
@@ -1418,6 +1422,7 @@ function HollowLib:CreateWindow(config)
                 local KBText = MakeLabel(KBBtn, keyName, 9, Theme.Accent, Enum.Font.GothamMedium, Enum.TextXAlignment.Center)
                 KBText.Size = UDim2.new(1,0,1,0) KBText.TextYAlignment = Enum.TextYAlignment.Center
 
+                -- Click to rebind
                 KBBtn.MouseButton1Click:Connect(function()
                     if listening then return end
                     listening = true KBText.Text = "..." KBText.TextColor3 = Theme.Text
@@ -1436,6 +1441,7 @@ function HollowLib:CreateWindow(config)
                             if cfg.IsHideKey then
                                 hideKey = key Window:Notify("Hide key: "..tostring(key.Name), 2)
                             end
+                            KB.Value = key
                             conn:Disconnect()
                         end
                     end)
@@ -1444,7 +1450,38 @@ function HollowLib:CreateWindow(config)
                 KBBtn.MouseEnter:Connect(function() if not listening then Tween(KBBtn,{BackgroundColor3=Theme.GroupHeader},0.1) end end)
                 KBBtn.MouseLeave:Connect(function() if not listening then Tween(KBBtn,{BackgroundColor3=Theme.DropBG},0.1) end end)
 
-                function KB:SetValue(k) key=k KBText.Text=tostring(k.Name) if cfg.IsHideKey then hideKey=k end end
+                -- GLOBAL KEY LISTENER - fires toggle when bound key is pressed
+                if syncToggle and id then
+                    -- InputBegan: key pressed
+                    UserInputService.InputBegan:Connect(function(input, gameProcessed)
+                        if gameProcessed or listening then return end
+                        if input.KeyCode == key and key ~= Enum.KeyCode.Unknown then
+                            -- Find the associated toggle
+                            local toggle = env.Toggles and env.Toggles[id]
+                            if toggle and toggle.SetValue then
+                                if mode == 'Toggle' then
+                                    toggle:SetValue(not toggle.Value)
+                                elseif mode == 'Hold' then
+                                    toggle:SetValue(true)
+                                end
+                            end
+                        end
+                    end)
+
+                    -- InputEnded: for Hold mode
+                    if mode == 'Hold' then
+                        UserInputService.InputEnded:Connect(function(input, gameProcessed)
+                            if input.KeyCode == key and key ~= Enum.KeyCode.Unknown then
+                                local toggle = env.Toggles and env.Toggles[id]
+                                if toggle and toggle.SetValue then
+                                    toggle:SetValue(false)
+                                end
+                            end
+                        end)
+                    end
+                end
+
+                function KB:SetValue(k) key=k KBText.Text=tostring(k.Name) if cfg.IsHideKey then hideKey=k end KB.Value=k end
                 function KB:GetValue() return key end
 
                 KB.Value = key
