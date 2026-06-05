@@ -1702,7 +1702,28 @@ function HollowLib:CreateWindow(config)
                         Proxy[k] = function(self, ...)
                             baseGroup:_setContainer(tbContent)
                             local result = v(baseGroup, ...)
-                            baseGroup:_setContainer(origContainer)
+                            -- DON'T restore yet - chains like :AddKeyPicker need the same container
+                            -- Next tab's Add call will set its own container
+                            
+                            -- Wrap chain methods on the result to also use this container
+                            if type(result) == "table" then
+                                local origAddKP = result.AddKeyPicker
+                                local origAddCP = result.AddColorPicker
+                                if origAddKP then
+                                    result.AddKeyPicker = function(s, ...)
+                                        baseGroup:_setContainer(tbContent)
+                                        local r = origAddKP(s, ...)
+                                        return r
+                                    end
+                                end
+                                if origAddCP then
+                                    result.AddColorPicker = function(s, ...)
+                                        baseGroup:_setContainer(tbContent)
+                                        local r = origAddCP(s, ...)
+                                        return r
+                                    end
+                                end
+                            end
                             return result
                         end
                     elseif type(v) == "function" then
