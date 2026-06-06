@@ -5,6 +5,39 @@ local HollowLib = {}
 HollowLib.__index = HollowLib
 HollowLib.Flags = {}
 
+-- Global keybind registry for SyncToggleState
+local _keybindRegistry = {}
+game:GetService("UserInputService").InputBegan:Connect(function(input, gpe)
+    if input.UserInputType ~= Enum.UserInputType.Keyboard then return end
+    for _, kb in ipairs(_keybindRegistry) do
+        if not kb.isListening() and input.KeyCode == kb.getKey() and kb.getKey() ~= Enum.KeyCode.Unknown then
+            pcall(function()
+                local toggle = getgenv().Toggles and getgenv().Toggles[kb.id]
+                if toggle and toggle.SetValue then
+                    if kb.mode == 'Toggle' then
+                        toggle:SetValue(not toggle.Value)
+                    elseif kb.mode == 'Hold' then
+                        toggle:SetValue(true)
+                    end
+                end
+            end)
+        end
+    end
+end)
+game:GetService("UserInputService").InputEnded:Connect(function(input)
+    if input.UserInputType ~= Enum.UserInputType.Keyboard then return end
+    for _, kb in ipairs(_keybindRegistry) do
+        if kb.mode == 'Hold' and input.KeyCode == kb.getKey() and kb.getKey() ~= Enum.KeyCode.Unknown then
+            pcall(function()
+                local toggle = getgenv().Toggles and getgenv().Toggles[kb.id]
+                if toggle and toggle.SetValue then
+                    toggle:SetValue(false)
+                end
+            end)
+        end
+    end
+end)
+
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
@@ -1450,38 +1483,14 @@ function HollowLib:CreateWindow(config)
                 KBBtn.MouseEnter:Connect(function() if not listening then Tween(KBBtn,{BackgroundColor3=Theme.GroupHeader},0.1) end end)
                 KBBtn.MouseLeave:Connect(function() if not listening then Tween(KBBtn,{BackgroundColor3=Theme.DropBG},0.1) end end)
 
-                -- GLOBAL KEY LISTENER - fires toggle when bound key is pressed
+                -- Register in global keybind registry for SyncToggleState
                 if syncToggle and id then
-                    local UIS = game:GetService("UserInputService")
-                    
-                    UIS.InputBegan:Connect(function(input, gpe)
-                        if listening then return end
-                        if input.UserInputType == Enum.UserInputType.Keyboard and input.KeyCode == key and key ~= Enum.KeyCode.Unknown then
-                            pcall(function()
-                                local toggle = env.Toggles[id]
-                                if toggle and toggle.SetValue then
-                                    if mode == 'Toggle' then
-                                        toggle:SetValue(not toggle.Value)
-                                    elseif mode == 'Hold' then
-                                        toggle:SetValue(true)
-                                    end
-                                end
-                            end)
-                        end
-                    end)
-
-                    if mode == 'Hold' then
-                        UIS.InputEnded:Connect(function(input)
-                            if input.KeyCode == key and key ~= Enum.KeyCode.Unknown then
-                                pcall(function()
-                                    local toggle = env.Toggles[id]
-                                    if toggle and toggle.SetValue then
-                                        toggle:SetValue(false)
-                                    end
-                                end)
-                            end
-                        end)
-                    end
+                    table.insert(_keybindRegistry, {
+                        id = id,
+                        getKey = function() return key end,
+                        isListening = function() return listening end,
+                        mode = mode,
+                    })
                 end
 
                 function KB:SetValue(k) key=k KBText.Text=tostring(k.Name) if cfg.IsHideKey then hideKey=k end KB.Value=k end
