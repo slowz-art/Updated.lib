@@ -621,33 +621,41 @@ function HollowLib:CreateWindow(config)
         -- ==================
         -- ADD GROUPBOX
         -- ==================
-        local function AddGroupInternal(name, col)
+        local function AddGroupInternal(name, col, existingContainer)
             local Group = {}
 
-            local GroupFrame = MakeFrame(col, UDim2.new(1,0,0,0), nil, Theme.GroupBG)
-            pcall(function() GroupFrame.AutomaticSize = Enum.AutomaticSize.Y end)
-            GroupFrame.BackgroundTransparency = 1
-            MakeCorner(GroupFrame, Radius.Group) MakeStroke(GroupFrame, Theme.Border, 1)
-            GroupFrame.ClipsDescendants = false
+            local GroupFrame, ItemContainer
 
-            local Header = MakeFrame(GroupFrame, UDim2.new(1,0,0,28), nil, Theme.GroupHeader)
-            Header.BackgroundTransparency = 1
-            MakeCorner(Header, Radius.Group)
-            local HeaderFill = MakeFrame(Header, UDim2.new(1,0,0.5,0), UDim2.new(0,0,0.5,0), Theme.GroupHeader)
-            HeaderFill.BackgroundTransparency = 1
+            if existingContainer then
+                -- Use existing container directly (for TabBox tabs)
+                GroupFrame = existingContainer
+                ItemContainer = existingContainer
+            else
+                GroupFrame = MakeFrame(col, UDim2.new(1,0,0,0), nil, Theme.GroupBG)
+                pcall(function() GroupFrame.AutomaticSize = Enum.AutomaticSize.Y end)
+                GroupFrame.BackgroundTransparency = 1
+                MakeCorner(GroupFrame, Radius.Group) MakeStroke(GroupFrame, Theme.Border, 1)
+                GroupFrame.ClipsDescendants = false
 
-            local AccentLine = MakeFrame(Header, UDim2.new(0,3,0,12), UDim2.new(0,8,0.5,-6), Theme.Accent)
-            MakeCorner(AccentLine, 2)
+                local Header = MakeFrame(GroupFrame, UDim2.new(1,0,0,28), nil, Theme.GroupHeader)
+                Header.BackgroundTransparency = 1
+                MakeCorner(Header, Radius.Group)
+                local HeaderFill = MakeFrame(Header, UDim2.new(1,0,0.5,0), UDim2.new(0,0,0.5,0), Theme.GroupHeader)
+                HeaderFill.BackgroundTransparency = 1
 
-            local GroupTitle = MakeLabel(Header, name, 11, Theme.Text, Enum.Font.GothamBold)
-            GroupTitle.Size = UDim2.new(1,-20,1,0) GroupTitle.Position = UDim2.new(0,18,0,0)
-            GroupTitle.TextYAlignment = Enum.TextYAlignment.Center
+                local AccentLine = MakeFrame(Header, UDim2.new(0,3,0,12), UDim2.new(0,8,0.5,-6), Theme.Accent)
+                MakeCorner(AccentLine, 2)
 
-            local ItemContainer = MakeFrame(GroupFrame, UDim2.new(1,0,0,0), UDim2.new(0,0,0,28), Theme.GroupBG)
-            pcall(function() ItemContainer.AutomaticSize = Enum.AutomaticSize.Y end)
-            ItemContainer.BackgroundTransparency = 1
-            MakeCorner(ItemContainer, Radius.Group) MakePadding(ItemContainer, 8, 10, 8, 8)
-            MakeList(ItemContainer, 6)
+                local GroupTitle = MakeLabel(Header, name, 11, Theme.Text, Enum.Font.GothamBold)
+                GroupTitle.Size = UDim2.new(1,-20,1,0) GroupTitle.Position = UDim2.new(0,18,0,0)
+                GroupTitle.TextYAlignment = Enum.TextYAlignment.Center
+
+                ItemContainer = MakeFrame(GroupFrame, UDim2.new(1,0,0,0), UDim2.new(0,0,0,28), Theme.GroupBG)
+                pcall(function() ItemContainer.AutomaticSize = Enum.AutomaticSize.Y end)
+                ItemContainer.BackgroundTransparency = 1
+                MakeCorner(ItemContainer, Radius.Group) MakePadding(ItemContainer, 8, 10, 8, 8)
+                MakeList(ItemContainer, 6)
+            end
 
             -- Dependency system: show/hide elements based on other element values
             local dependencyChecks = {}
@@ -1663,39 +1671,19 @@ function HollowLib:CreateWindow(config)
 
         -- TRUE TabBox - single box with switchable tab headers
         local function CreateTabBox(col)
-            -- Create one real group to get Add methods with proper ItemContainer access
-            local baseGroup = AddGroupInternal("_tb", col)
-            local origContainer = baseGroup:_getContainer()
-            
-            -- Find and hide the auto-created group frame header, keep the frame
-            local tbFrame = nil
-            for i = #col:GetChildren(), 1, -1 do
-                local ch = col:GetChildren()[i]
-                if ch:IsA("Frame") then
-                    local hdr = ch:FindFirstChildWhichIsA("TextLabel")
-                    if hdr and hdr.Text == "_tb" then
-                        tbFrame = ch
-                        hdr.Visible = false
-                        hdr.Size = UDim2.new(0,0,0,0)
-                        break
-                    end
-                end
-            end
+            -- Outer frame with border
+            local TBFrame = MakeFrame(col, UDim2.new(1,0,0,28), nil, Theme.GroupBG)
+            pcall(function() TBFrame.AutomaticSize = Enum.AutomaticSize.Y end)
+            TBFrame.ClipsDescendants = true
+            MakeCorner(TBFrame, Radius.Group)
+            MakeStroke(TBFrame, Theme.Border, 1)
 
-            -- Add tab header row at the top of the group frame
-            if tbFrame then
-                -- Move ItemContainer down to make room for header
-                origContainer.Position = UDim2.new(0, 0, 0, 28)
-                origContainer.Visible = false -- hide original, we use tab content frames
-            end
-
-            local tabHeader = MakeFrame(tbFrame, UDim2.new(1,0,0,28), UDim2.new(0,0,0,0), Theme.GroupBG)
-            tabHeader.BackgroundTransparency = 0.5
-            tabHeader.ZIndex = 2
+            -- Tab header
+            local TBHeader = MakeFrame(TBFrame, UDim2.new(1,0,0,28), nil, Theme.GroupBG)
+            TBHeader.BackgroundTransparency = 0.5 TBHeader.ZIndex = 2
             local hl = Instance.new("UIListLayout")
             hl.FillDirection = Enum.FillDirection.Horizontal
-            hl.Padding = UDim.new(0, 0)
-            hl.Parent = tabHeader
+            hl.Padding = UDim.new(0,0) hl.Parent = TBHeader
 
             local tbTabs = {}
             local TBObj = {}
@@ -1705,20 +1693,17 @@ function HollowLib:CreateWindow(config)
 
                 -- Header button
                 local tbBtn = Instance.new("TextButton")
-                tbBtn.BackgroundTransparency = 1
-                tbBtn.Text = tabName
-                tbBtn.Font = Enum.Font.GothamMedium
-                tbBtn.TextSize = 11
+                tbBtn.BackgroundTransparency = 1 tbBtn.Text = tabName
+                tbBtn.Font = Enum.Font.GothamMedium tbBtn.TextSize = 11
                 tbBtn.TextColor3 = idx == 1 and Theme.Text or Theme.TextDim
-                tbBtn.BorderSizePixel = 0
-                tbBtn.Parent = tabHeader
+                tbBtn.BorderSizePixel = 0 tbBtn.Parent = TBHeader
 
                 local tbLine = MakeFrame(tbBtn, UDim2.new(0.5,0,0,2), UDim2.new(0.25,0,1,-2), Theme.Accent)
                 MakeCorner(tbLine, 1)
                 tbLine.BackgroundTransparency = idx == 1 and 0 or 1
 
-                -- Content frame for this tab (inside the group frame)
-                local tbContent = MakeFrame(tbFrame, UDim2.new(1,0,0,0), UDim2.new(0,0,0,28), Theme.GroupBG)
+                -- Content frame for this tab
+                local tbContent = MakeFrame(TBFrame, UDim2.new(1,0,0,0), UDim2.new(0,0,0,28), Theme.GroupBG)
                 tbContent.BackgroundTransparency = 1
                 pcall(function() tbContent.AutomaticSize = Enum.AutomaticSize.Y end)
                 tbContent.Visible = (idx == 1)
@@ -1726,13 +1711,9 @@ function HollowLib:CreateWindow(config)
                 MakeList(tbContent, 6)
 
                 table.insert(tbTabs, {btn=tbBtn, content=tbContent, line=tbLine})
+                for _, t in ipairs(tbTabs) do t.btn.Size = UDim2.new(1/#tbTabs, 0, 1, 0) end
 
-                -- Resize buttons equally
-                for _, t in ipairs(tbTabs) do
-                    t.btn.Size = UDim2.new(1/#tbTabs, 0, 1, 0)
-                end
-
-                -- Switch tabs on click
+                -- Switch tabs
                 tbBtn.MouseButton1Click:Connect(function()
                     for _, t in ipairs(tbTabs) do
                         t.content.Visible = false
@@ -1744,45 +1725,10 @@ function HollowLib:CreateWindow(config)
                     Tween(tbLine, {BackgroundTransparency=0}, 0.15)
                 end)
 
-                -- Create proxy that swaps ItemContainer via upvalue
-                local Proxy = {}
-                for k, v in pairs(baseGroup) do
-                    if type(v) == "function" and type(k) == "string" and k:sub(1,3) == "Add" then
-                        Proxy[k] = function(self, ...)
-                            baseGroup:_setContainer(tbContent)
-                            local result = v(baseGroup, ...)
-                            -- DON'T restore yet - chains like :AddKeyPicker need the same container
-                            -- Next tab's Add call will set its own container
-                            
-                            -- Wrap chain methods on the result to also use this container
-                            if type(result) == "table" then
-                                local origAddKP = result.AddKeyPicker
-                                local origAddCP = result.AddColorPicker
-                                if origAddKP then
-                                    result.AddKeyPicker = function(s, ...)
-                                        baseGroup:_setContainer(tbContent)
-                                        local r = origAddKP(s, ...)
-                                        return r
-                                    end
-                                end
-                                if origAddCP then
-                                    result.AddColorPicker = function(s, ...)
-                                        baseGroup:_setContainer(tbContent)
-                                        local r = origAddCP(s, ...)
-                                        return r
-                                    end
-                                end
-                            end
-                            return result
-                        end
-                    elseif type(v) == "function" then
-                        Proxy[k] = function(self, ...) return v(baseGroup, ...) end
-                    else
-                        Proxy[k] = v
-                    end
-                end
-
-                return Proxy
+                -- Each tab gets its OWN independent Group via AddGroupInternal
+                -- passing tbContent so elements go directly to this tab's frame
+                local tabGroup = AddGroupInternal(tabName, col, tbContent)
+                return tabGroup
             end
 
             return TBObj
@@ -1790,6 +1736,7 @@ function HollowLib:CreateWindow(config)
 
         function Tab:AddLeftTabbox() return CreateTabBox(LeftCol) end
         function Tab:AddRightTabbox() return CreateTabBox(RightCol) end
+
 
 
 
