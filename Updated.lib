@@ -134,10 +134,10 @@ local Radius = {
 }
 
 local PADDING = {
-    GroupPadding = 12,    -- inside group containers
-    ItemPadding = 10,     -- inside each control row
-    ListSpacing = 8,      -- between items in a list
-    SidePadding = 12,     -- left/right margin inside groups
+    GroupPadding = 12,
+    ItemPadding = 10,
+    ListSpacing = 8,
+    SidePadding = 12,
 }
 
 local function Tween(obj, props, t, style, dir)
@@ -318,11 +318,12 @@ function HollowLib:CreateWindow(config)
     BGImage.Size = UDim2.new(1,0,1,0)
     BGImage.Position = UDim2.new(0,0,0,0)
     BGImage.BackgroundColor3 = bgColor
-    BGImage.BackgroundTransparency = 1
+    BGImage.BackgroundTransparency = 1  -- Keep transparent background
     BGImage.ImageTransparency = bgTransparency
     BGImage.ScaleType = Enum.ScaleType.Crop
     BGImage.ZIndex = 0
     BGImage.BorderSizePixel = 0
+    BGImage.Visible = true
     BGImage.Parent = Main
     MakeCorner(BGImage, Radius.Window)
     if bgTexture then
@@ -522,7 +523,7 @@ function HollowLib:CreateWindow(config)
     Content.ClipsDescendants = true
     MakeCorner(Content, Radius.Window)
 
-    local sideExpanded = 130  -- slightly wider for more breathing room
+    local sideExpanded = 130
     local sideCollapsed = 42
     local sideOpen = true
 
@@ -696,7 +697,7 @@ function HollowLib:CreateWindow(config)
         local isActive = false
         local hasImageIcon = icon and (type(icon) == "number" or tostring(icon):find("rbxassetid"))
 
-        local TabBtn = MakeButton(TabList, UDim2.new(1,0,0,32), nil, Theme.TabInactive)  -- slightly taller
+        local TabBtn = MakeButton(TabList, UDim2.new(1,0,0,32), nil, Theme.TabInactive)
         TabBtn.BackgroundTransparency = 1
         MakeCorner(TabBtn, Radius.Small)
 
@@ -742,7 +743,7 @@ function HollowLib:CreateWindow(config)
         TabScroll.Parent = TabPage
 
         local InnerWrap = Instance.new("Frame")
-        InnerWrap.Size = UDim2.new(1,-24,0,0)   -- extra side margin
+        InnerWrap.Size = UDim2.new(1,-24,0,0)
         InnerWrap.Position = UDim2.new(0,12,0,12)
         InnerWrap.BackgroundTransparency = 1
         InnerWrap.BorderSizePixel = 0
@@ -754,14 +755,14 @@ function HollowLib:CreateWindow(config)
 
         local ColLayout = Instance.new("UIListLayout")
         ColLayout.FillDirection = Enum.FillDirection.Horizontal
-        ColLayout.Padding = UDim.new(0, 14)   -- more space between columns
+        ColLayout.Padding = UDim.new(0, 14)
         ColLayout.SortOrder = Enum.SortOrder.LayoutOrder
         ColLayout.VerticalAlignment = Enum.VerticalAlignment.Top
         ColLayout.Parent = ColHolder
 
         local LeftCol = MakeFrame(ColHolder, UDim2.new(0.5,-7,0,0), nil, Theme.Background, 1)
         pcall(function() LeftCol.AutomaticSize = Enum.AutomaticSize.Y end)
-        MakeList(LeftCol, 10)  -- larger item spacing
+        MakeList(LeftCol, 10)
 
         local RightCol = MakeFrame(ColHolder, UDim2.new(0.5,-7,0,0), nil, Theme.Background, 1)
         pcall(function() RightCol.AutomaticSize = Enum.AutomaticSize.Y end)
@@ -829,7 +830,7 @@ function HollowLib:CreateWindow(config)
                 MakeCorner(GroupFrame, Radius.Group) MakeStroke(GroupFrame, Theme.Border, 1)
                 GroupFrame.ClipsDescendants = false
 
-                local Header = MakeFrame(GroupFrame, UDim2.new(1,0,0,32), nil, Theme.GroupHeader)  -- taller header
+                local Header = MakeFrame(GroupFrame, UDim2.new(1,0,0,32), nil, Theme.GroupHeader)
                 Header.BackgroundTransparency = 1
                 MakeCorner(Header, Radius.Group)
                 local HeaderFill = MakeFrame(Header, UDim2.new(1,0,0.5,0), UDim2.new(0,0,0.5,0), Theme.GroupHeader)
@@ -846,8 +847,8 @@ function HollowLib:CreateWindow(config)
                 pcall(function() ItemContainer.AutomaticSize = Enum.AutomaticSize.Y end)
                 ItemContainer.BackgroundTransparency = 1
                 MakeCorner(ItemContainer, Radius.Group) 
-                MakePadding(ItemContainer, 10, 12, 10, 10)  -- more padding
-                MakeList(ItemContainer, 8)  -- larger spacing
+                MakePadding(ItemContainer, 10, 12, 10, 10)
+                MakeList(ItemContainer, 8)
             end
 
             local dependencyList = {}
@@ -885,14 +886,14 @@ function HollowLib:CreateWindow(config)
                 local state = cfg.Default or false
                 local callback = cfg.Callback or function() end
 
-                local Row = MakeFrame(ItemContainer, UDim2.new(1,0,0,28), nil, Theme.ItemBG)  -- taller row
+                local Row = MakeFrame(ItemContainer, UDim2.new(1,0,0,28), nil, Theme.ItemBG)
                 Row.BackgroundTransparency = 1
                 MakePadding(Row, 0, 0, 4, 4)
 
                 local RowBtn = MakeButton(Row, UDim2.new(1,0,1,0), nil, Theme.ItemBG)
                 RowBtn.BackgroundTransparency = 1
 
-                local CheckBox = MakeFrame(Row, UDim2.new(0,15,0,15), UDim2.new(0,0,0.5,-7), Theme.Toggle)  -- slightly bigger
+                local CheckBox = MakeFrame(Row, UDim2.new(0,15,0,15), UDim2.new(0,0,0.5,-7), Theme.Toggle)
                 MakeCorner(CheckBox, 3)
                 local CheckStroke = MakeStroke(CheckBox, Theme.Border, 1)
 
@@ -1733,7 +1734,7 @@ function HollowLib:CreateWindow(config)
         function Tab:AddRightGroupbox(name) return AddGroupInternal(name, RightCol) end
         function Tab:AddGroupbox(name) return AddGroupInternal(name, LeftCol) end
 
-        -- ===== TAB BOX (with transparency fix) =====
+        -- ===== TAB BOX =====
         local function CreateTabBox(col)
             local TBFrame = MakeFrame(col, UDim2.new(1,0,0,32), nil, Theme.GroupBG)
             pcall(function() TBFrame.AutomaticSize = Enum.AutomaticSize.Y end)
@@ -1825,12 +1826,15 @@ function HollowLib:CreateWindow(config)
     function Window:SetUsername(name) end
     function Window:SetLogo(textureId) if LogoImg then LogoImg.Image = "rbxassetid://"..tostring(textureId) end end
     
-    -- ===== BACKGROUND METHODS (NATIVE SUPPORT) =====
+    -- ===== BACKGROUND METHODS – FIXED: no forced transparency =====
     function Window:SetBackground(textureId, transparency)
         local id = tostring(textureId)
         if tonumber(id) then id = "rbxassetid://" .. id end
         BGImage.Image = id
-        if transparency ~= nil then BGImage.ImageTransparency = transparency end
+        if transparency ~= nil then 
+            BGImage.ImageTransparency = transparency
+        end
+        -- DO NOT force BackgroundTransparency or Visible – preserve user's setting
     end
     
     function Window:SetBackgroundColor(color)
@@ -1890,7 +1894,7 @@ local function GetDefaultGroup()
             ShowLogo = false,
             TitleType = "sliding",
             Words = {"1up Compatible", "HollowLib v2.3", "Full API Support"},
-            Accent = Color3.fromRGB(50, 150, 255),   -- Blue accent
+            Accent = Color3.fromRGB(50, 150, 255),
             HideKey = Enum.KeyCode.RightControl,
         })
         _defaultTab = _defaultWindow:AddTab("Main", "📁")
