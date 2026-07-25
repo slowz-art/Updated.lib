@@ -940,6 +940,7 @@ function HollowLib:CreateWindow(config)
                 return Toggle
             end
 
+            -- ===== UPDATED SLIDER WITH HANDLE (DOT) =====
             function Group:AddSlider(id, cfg)
                 local Slider = {}
                 local min = cfg.Min or 0 local max = cfg.Max or 100
@@ -949,32 +950,36 @@ function HollowLib:CreateWindow(config)
                 local callback = cfg.Callback or function() end
                 local dragging = false
 
-                local Container = MakeFrame(ItemContainer, UDim2.new(1,0,0,36), nil, Theme.ItemBG)
+                local Container = MakeFrame(ItemContainer, UDim2.new(1,0,0,38), nil, Theme.ItemBG)
                 Container.BackgroundTransparency = 1
                 MakePadding(Container, 2, 2, 6, 6)
 
                 local SliderLabel = MakeLabel(Container, cfg.Text or id, 11, Theme.TextDim, Enum.Font.Gotham)
                 SliderLabel.Size = UDim2.new(1,0,0,14)
 
-                local SliderBG = MakeFrame(Container, UDim2.new(1,0,0,14), UDim2.new(0,0,0,18), Theme.SliderBG)
+                local SliderBG = MakeFrame(Container, UDim2.new(1,0,0,18), UDim2.new(0,0,0,18), Theme.SliderBG)
                 MakeCorner(SliderBG, 4)
 
-                local alpha = (value-min)/(max-min)
-
-                local SliderFill = MakeFrame(SliderBG, UDim2.new(alpha,0,1,0), nil, Theme.SliderFill)
+                -- Fill
+                local SliderFill = MakeFrame(SliderBG, UDim2.new(0,0,1,0), nil, Theme.SliderFill)
                 MakeCorner(SliderFill, 4)
 
+                -- Handle (dot)
+                local HandleSize = 18
+                local Handle = MakeFrame(SliderBG, UDim2.new(0, HandleSize, 0, HandleSize), UDim2.new(0,0,0.5,-HandleSize/2), Theme.Accent)
+                MakeCorner(Handle, HandleSize/2)
+                MakeStroke(Handle, Color3.new(1,1,1), 1.5)  -- White border for visibility
+
+                -- Value label
                 local ValueLabel = MakeLabel(SliderBG, tostring(value) .. suffix .. "/" .. tostring(max) .. suffix, 9, Theme.Text, Enum.Font.GothamBold, Enum.TextXAlignment.Center)
                 ValueLabel.Size = UDim2.new(1,0,1,0)
                 ValueLabel.TextYAlignment = Enum.TextYAlignment.Center
                 ValueLabel.ZIndex = 3
 
-                local SliderBtn = MakeButton(SliderBG, UDim2.new(1,0,1,12), UDim2.new(0,0,0,-6), Theme.Background)
-                SliderBtn.BackgroundTransparency = 1 SliderBtn.ZIndex = 4
-
                 local sliderOnChanged = nil
 
-                local function UpdateSlider(input)
+                local function UpdateSliderFromPosition(input)
+                    if not SliderBG or not SliderBG.Parent then return end
                     local rel = math.clamp((input.Position.X - SliderBG.AbsolutePosition.X) / SliderBG.AbsoluteSize.X, 0, 1)
                     local raw = min + (max-min) * rel
                     value = raw - (raw % step)
@@ -984,6 +989,7 @@ function HollowLib:CreateWindow(config)
                     value = math.clamp(value, min, max)
                     local a = (value-min)/(max-min)
                     Tween(SliderFill, {Size=UDim2.new(a,0,1,0)}, 0.06, Enum.EasingStyle.Quart)
+                    Tween(Handle, {Position=UDim2.new(a, -HandleSize/2, 0.5, -HandleSize/2)}, 0.06, Enum.EasingStyle.Quart)
                     ValueLabel.Text = tostring(value) .. suffix .. "/" .. tostring(max) .. suffix
                     Slider.Value = value
                     callback(value)
@@ -991,21 +997,40 @@ function HollowLib:CreateWindow(config)
                     RunDependencyChecks()
                 end
 
-                SliderBtn.MouseButton1Down:Connect(function() dragging = true end)
-                SliderBtn.TouchTap:Connect(function(touches) if touches[1] then UpdateSlider(touches[1]) end end)
-                UserInputService.InputChanged:Connect(function(i)
-                    if dragging and (i.UserInputType==Enum.UserInputType.MouseMovement or i.UserInputType==Enum.UserInputType.Touch) then UpdateSlider(i) end
+                -- Make handle draggable
+                Handle.InputBegan:Connect(function(input)
+                    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+                        dragging = true
+                        -- Update immediately on click/tap
+                        UpdateSliderFromPosition(input)
+                    end
                 end)
-                UserInputService.InputEnded:Connect(function(i)
-                    if i.UserInputType==Enum.UserInputType.MouseButton1 or i.UserInputType==Enum.UserInputType.Touch then
+
+                UserInputService.InputChanged:Connect(function(input)
+                    if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+                        UpdateSliderFromPosition(input)
+                    end
+                end)
+
+                UserInputService.InputEnded:Connect(function(input)
+                    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
                         dragging = false
                     end
+                end)
+
+                -- Also allow clicking on the track
+                local SliderTrackBtn = MakeButton(SliderBG, UDim2.new(1,0,1,0), nil, Theme.Background)
+                SliderTrackBtn.BackgroundTransparency = 1
+                SliderTrackBtn.MouseButton1Down:Connect(UpdateSliderFromPosition)
+                SliderTrackBtn.TouchTap:Connect(function(touches)
+                    if touches and touches[1] then UpdateSliderFromPosition(touches[1]) end
                 end)
 
                 function Slider:SetValue(v)
                     value = math.clamp(v,min,max)
                     local a=(value-min)/(max-min)
                     Tween(SliderFill,{Size=UDim2.new(a,0,1,0)},0.15)
+                    Tween(Handle,{Position=UDim2.new(a, -HandleSize/2, 0.5, -HandleSize/2)},0.15)
                     ValueLabel.Text = tostring(value) .. suffix .. "/" .. tostring(max) .. suffix
                     Slider.Value = value
                     callback(value)
