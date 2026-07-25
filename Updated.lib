@@ -105,11 +105,15 @@ local Theme = {
     TabInactive = Color3.fromRGB(12, 12, 18),
     TabHover    = Color3.fromRGB(26, 38, 60),
     Watermark   = Color3.fromRGB(12, 12, 18),
+    Success     = Color3.fromRGB(70, 150, 255),
+    Warning     = Color3.fromRGB(220, 180, 30),
+    Danger      = Color3.fromRGB(220, 50, 50),
+    HandleBorder= Color3.fromRGB(240, 240, 248),
 }
 
 -- Sizing & spacing
 local Radius = { Window = 12, Group = 10, Item = 8, Button = 8, Toggle = 8, Small = 6, Pill = 14 }
-local PADDING = { GroupPadding = 14, ItemPadding = 12, ListSpacing = 10, SidePadding = 14 }
+local PADDING = { GroupPadding = 16, ItemPadding = 14, ListSpacing = 12, SidePadding = 16 }
 
 local function Tween(obj, props, t, style, dir)
     TweenService:Create(obj, TweenInfo.new(t or 0.2, style or Enum.EasingStyle.Quart, dir or Enum.EasingDirection.Out), props):Play()
@@ -236,6 +240,7 @@ function HollowLib:CreateWindow(config)
         Theme.ToggleOn = config.Accent
         Theme.SliderFill = config.Accent
         Theme.TabActive = config.Accent
+        Theme.Success = config.Accent
     end
 
     local Main = MakeFrame(ScreenGui, UDim2.new(0,curW,0,curH), UDim2.new(0.5,-curW/2,0.5,-curH/2), Theme.Background)
@@ -436,16 +441,16 @@ function HollowLib:CreateWindow(config)
     MakeStroke(Sidebar, Theme.Border, 1)
 
     local SideTitle = MakeLabel(Sidebar, config.MenuTitle or "MENU", 9, Theme.TextDisabled, Enum.Font.GothamBold)
-    SideTitle.Size = UDim2.new(1,-20,0,16) SideTitle.Position = UDim2.new(0,12,0,10)
+    SideTitle.Size = UDim2.new(1,-20,0,16) SideTitle.Position = UDim2.new(0,14,0,12)
     SideTitle.TextXAlignment = Enum.TextXAlignment.Center
 
-    local TabList = MakeFrame(Sidebar, UDim2.new(1,0,1,-46), UDim2.new(0,0,0,32), Theme.Sidebar)
+    local TabList = MakeFrame(Sidebar, UDim2.new(1,0,1,-46), UDim2.new(0,0,0,34), Theme.Sidebar)
     TabList.BackgroundTransparency = 1 TabList.ClipsDescendants = true
-    MakeList(TabList, 6) MakePadding(TabList, 6, 8, 12, 12)
+    MakeList(TabList, 8) MakePadding(TabList, 8, 10, 14, 14)
 
     local PlayerInfo = MakeFrame(Sidebar, UDim2.new(1,0,0,44), UDim2.new(0,0,1,-44), Theme.Sidebar)
     PlayerInfo.BackgroundTransparency = 1 MakeStroke(PlayerInfo, Theme.Border, 1)
-    MakePadding(PlayerInfo, 6, 6, 12, 12)
+    MakePadding(PlayerInfo, 8, 8, 14, 14)
 
     local PlayerAvatar = Instance.new("ImageLabel")
     PlayerAvatar.Size = UDim2.new(0,26,0,26)
@@ -524,9 +529,9 @@ function HollowLib:CreateWindow(config)
         pcall(function() if statsOk and stats then ping = math.floor(stats.Network.ServerStatsItem["Data Ping"]:GetValue()) end end)
         WMFps.Text = math.floor(fps).."fps"
         WMPing.Text = ping.."ms"
-        if fps >= 50 then WMFps.TextColor3 = Theme.Accent
-        elseif fps >= 30 then WMFps.TextColor3 = Color3.fromRGB(220,180,30)
-        else WMFps.TextColor3 = Color3.fromRGB(220,50,50) end
+        if fps >= 50 then WMFps.TextColor3 = Theme.Success
+        elseif fps >= 30 then WMFps.TextColor3 = Theme.Warning
+        else WMFps.TextColor3 = Theme.Danger end
     end)
 
     UserInputService.InputBegan:Connect(function(input, gpe)
@@ -581,7 +586,7 @@ function HollowLib:CreateWindow(config)
         local isActive = false
         local hasImageIcon = icon and (type(icon) == "number" or tostring(icon):find("rbxassetid"))
 
-        local TabBtn = MakeButton(TabList, UDim2.new(1,0,0,32), nil, Theme.TabInactive)
+        local TabBtn = MakeButton(TabList, UDim2.new(1,0,0,34), nil, Theme.TabInactive)
         TabBtn.BackgroundTransparency = 1 MakeCorner(TabBtn, Radius.Small)
 
         local TabIndicator = MakeFrame(TabBtn, UDim2.new(0,3,0,12), UDim2.new(0,0,0.5,-6), Theme.Accent)
@@ -626,8 +631,8 @@ function HollowLib:CreateWindow(config)
         TabScroll.Parent = TabPage
 
         local InnerWrap = Instance.new("Frame")
-        InnerWrap.Size = UDim2.new(1,-24,0,0)
-        InnerWrap.Position = UDim2.new(0,12,0,12)
+        InnerWrap.Size = UDim2.new(1,-32,0,0)
+        InnerWrap.Position = UDim2.new(0,16,0,16)
         InnerWrap.BackgroundTransparency = 1
         InnerWrap.BorderSizePixel = 0
         pcall(function() InnerWrap.AutomaticSize = Enum.AutomaticSize.Y end)
@@ -638,21 +643,21 @@ function HollowLib:CreateWindow(config)
 
         local ColLayout = Instance.new("UIListLayout")
         ColLayout.FillDirection = Enum.FillDirection.Horizontal
-        ColLayout.Padding = UDim.new(0, 14)
+        ColLayout.Padding = UDim.new(0, 18)
         ColLayout.SortOrder = Enum.SortOrder.LayoutOrder
         ColLayout.VerticalAlignment = Enum.VerticalAlignment.Top
         ColLayout.Parent = ColHolder
 
-        local LeftCol = MakeFrame(ColHolder, UDim2.new(0.5,-7,0,0), nil, Theme.Background, 1)
+        local LeftCol = MakeFrame(ColHolder, UDim2.new(0.5,-9,0,0), nil, Theme.Background, 1)
         pcall(function() LeftCol.AutomaticSize = Enum.AutomaticSize.Y end)
-        MakeList(LeftCol, 10)
+        MakeList(LeftCol, 14)
 
-        local RightCol = MakeFrame(ColHolder, UDim2.new(0.5,-7,0,0), nil, Theme.Background, 1)
+        local RightCol = MakeFrame(ColHolder, UDim2.new(0.5,-9,0,0), nil, Theme.Background, 1)
         pcall(function() RightCol.AutomaticSize = Enum.AutomaticSize.Y end)
-        MakeList(RightCol, 10)
+        MakeList(RightCol, 14)
 
         local BottomSpacer = Instance.new("Frame")
-        BottomSpacer.Size = UDim2.new(1,0,0,24)
+        BottomSpacer.Size = UDim2.new(1,0,0,28)
         BottomSpacer.BackgroundTransparency = 1
         BottomSpacer.LayoutOrder = 9999
         BottomSpacer.Parent = InnerWrap
@@ -688,7 +693,7 @@ function HollowLib:CreateWindow(config)
         end
 
         TabBtn.MouseEnter:Connect(function()
-            if not isActive then Tween(TabBtn, {BackgroundColor3=Color3.fromRGB(22,30,44)}, 0.2, Enum.EasingStyle.Quint) end
+            if not isActive then Tween(TabBtn, {BackgroundColor3=Theme.TabHover}, 0.2, Enum.EasingStyle.Quint) end
         end)
         TabBtn.MouseLeave:Connect(function()
             if not isActive then Tween(TabBtn, {BackgroundColor3=Theme.TabInactive}, 0.2, Enum.EasingStyle.Quint) end
@@ -712,25 +717,25 @@ function HollowLib:CreateWindow(config)
                 MakeCorner(GroupFrame, Radius.Group) MakeStroke(GroupFrame, Theme.Border, 1)
                 GroupFrame.ClipsDescendants = false
 
-                local Header = MakeFrame(GroupFrame, UDim2.new(1,0,0,34), nil, Theme.GroupHeader)
+                local Header = MakeFrame(GroupFrame, UDim2.new(1,0,0,36), nil, Theme.GroupHeader)
                 Header.BackgroundTransparency = 0.5
                 MakeCorner(Header, Radius.Group)
                 local HeaderFill = MakeFrame(Header, UDim2.new(1,0,0.5,0), UDim2.new(0,0,0.5,0), Theme.GroupHeader)
                 HeaderFill.BackgroundTransparency = 0.5
 
-                local AccentLine = MakeFrame(Header, UDim2.new(0,3,0,16), UDim2.new(0,10,0.5,-8), Theme.Accent)
+                local AccentLine = MakeFrame(Header, UDim2.new(0,3,0,16), UDim2.new(0,12,0.5,-8), Theme.Accent)
                 MakeCorner(AccentLine, 2)
 
                 local GroupTitle = MakeLabel(Header, name, 13, Theme.Text, Enum.Font.GothamBold)
-                GroupTitle.Size = UDim2.new(1,-20,1,0) GroupTitle.Position = UDim2.new(0,20,0,0)
+                GroupTitle.Size = UDim2.new(1,-24,1,0) GroupTitle.Position = UDim2.new(0,22,0,0)
                 GroupTitle.TextYAlignment = Enum.TextYAlignment.Center
 
-                ItemContainer = MakeFrame(GroupFrame, UDim2.new(1,0,0,0), UDim2.new(0,0,0,34), Theme.GroupBG)
+                ItemContainer = MakeFrame(GroupFrame, UDim2.new(1,0,0,0), UDim2.new(0,0,0,36), Theme.GroupBG)
                 pcall(function() ItemContainer.AutomaticSize = Enum.AutomaticSize.Y end)
                 ItemContainer.BackgroundTransparency = 1
                 MakeCorner(ItemContainer, Radius.Group)
-                MakePadding(ItemContainer, 12, 14, 12, 12)
-                MakeList(ItemContainer, 8)
+                MakePadding(ItemContainer, 14, 16, 14, 14)
+                MakeList(ItemContainer, 10)
             end
 
             local dependencyList = {}
@@ -858,7 +863,7 @@ function HollowLib:CreateWindow(config)
                 local HandleSize = 22
                 local Handle = MakeFrame(SliderBG, UDim2.new(0, HandleSize, 0, HandleSize), UDim2.new(0,0,0.5,-HandleSize/2), Theme.Accent)
                 MakeCorner(Handle, HandleSize/2)
-                MakeStroke(Handle, Color3.new(1,1,1), 2) -- white border
+                MakeStroke(Handle, Theme.HandleBorder, 2) -- themed border
 
                 -- Value label
                 local ValueLabel = MakeLabel(SliderBG, tostring(value) .. suffix .. "/" .. tostring(max) .. suffix, 9, Theme.Text, Enum.Font.GothamBold, Enum.TextXAlignment.Center)
@@ -1174,7 +1179,7 @@ function HollowLib:CreateWindow(config)
             end
 
             function Group:AddDivider()
-                local Div = MakeFrame(ItemContainer, UDim2.new(1,0,0,8), nil, Theme.GroupBG)
+                local Div = MakeFrame(ItemContainer, UDim2.new(1,0,0,10), nil, Theme.GroupBG)
                 Div.BackgroundTransparency = 1
                 local Line = MakeFrame(Div, UDim2.new(1,-20,0,1), UDim2.new(0,10,0.5,0), Theme.Border)
                 MakeCorner(Line, 1)
@@ -1183,7 +1188,7 @@ function HollowLib:CreateWindow(config)
 
             function Group:AddColorPicker(id, cfg)
                 local ColorPicker = {}
-                local color = cfg.Default or Color3.fromRGB(255,255,255)
+                local color = cfg.Default or Theme.Text
                 local callback = cfg.Callback or function() end
                 local pickerOpen = false
 
@@ -1220,6 +1225,7 @@ function HollowLib:CreateWindow(config)
                 SVFrame.ZIndex = 101
                 MakeCorner(SVFrame, 6) SVFrame.ClipsDescendants = true
 
+                -- Saturation/Value gradient overlays (functional HSV picker, colors are intrinsic to the control)
                 local WhiteOverlay = Instance.new("Frame")
                 WhiteOverlay.Size = UDim2.new(1,0,1,0)
                 WhiteOverlay.BackgroundColor3 = Color3.new(1,1,1)
@@ -1251,6 +1257,7 @@ function HollowLib:CreateWindow(config)
                 HueBar.ZIndex = 101
                 MakeCorner(HueBar, 4) HueBar.ClipsDescendants = true
 
+                -- Hue rainbow gradient (functional, must display the full spectrum)
                 local HueGrad = Instance.new("UIGradient")
                 HueGrad.Color = ColorSequence.new({
                     ColorSequenceKeypoint.new(0, Color3.fromHSV(0,1,1)),
@@ -1663,8 +1670,8 @@ function HollowLib:CreateWindow(config)
                 tbContent.BackgroundTransparency = 1
                 pcall(function() tbContent.AutomaticSize = Enum.AutomaticSize.Y end)
                 tbContent.Visible = (idx == 1)
-                MakePadding(tbContent, 10, 12, 10, 10)
-                MakeList(tbContent, 8)
+                MakePadding(tbContent, 12, 14, 12, 12)
+                MakeList(tbContent, 10)
 
                 table.insert(tbTabs, {btn=tbBtn, content=tbContent, line=tbLine})
                 for _, t in ipairs(tbTabs) do
@@ -1733,6 +1740,7 @@ function HollowLib:CreateWindow(config)
         Theme.ToggleOn = color
         Theme.SliderFill = color
         Theme.TabActive = color
+        Theme.Success = color
         WMBar.BackgroundColor3 = color
     end
 
@@ -1761,7 +1769,7 @@ local function GetDefaultGroup()
             ShowLogo = false,
             TitleType = "sliding",
             Words = {"1up Compatible", "HollowLib v2.3", "Full API Support"},
-            Accent = Color3.fromRGB(60, 140, 255),
+            Accent = Theme.Accent,
             HideKey = Enum.KeyCode.RightControl,
         })
         _defaultTab = _defaultWindow:AddTab("Main", "📁")
@@ -1791,7 +1799,7 @@ function HollowLib:Create(elementType, config)
         local id = config.Id or "Label"; env.Labels[id] = element
         element.SetText = function(self, text) self:SetText(text) end
     elseif elementType == "ColorPicker" then
-        element = group:AddColorPicker(config.Id or "ColorPicker", {Title=config.Title or "Color Picker", Default=config.Default or Color3.fromRGB(255,255,255), Callback=config.Callback or function() end})
+        element = group:AddColorPicker(config.Id or "ColorPicker", {Title=config.Title or "Color Picker", Default=config.Default or Theme.Text, Callback=config.Callback or function() end})
         local id = config.Id or "ColorPicker"; env.Options[id] = element
     elseif elementType == "Keybind" then
         element = group:AddKeyPicker(config.Id or "Keybind", {Text=config.Text or "Keybind", Default=config.Default or Enum.KeyCode.Unknown, SyncToggleState=config.SyncToggleState or false, Mode=config.Mode or "Toggle", Callback=config.Callback or function() end})
@@ -1842,6 +1850,7 @@ local Library = setmetatable({}, {
             Theme.ToggleOn = v
             Theme.SliderFill = v
             Theme.TabActive = v
+            Theme.Success = v
         elseif k == "FontColor" then Theme.Text = v
         elseif k == "MainColor" then Theme.Background = v
         elseif k == "BackgroundColor" then Theme.Sidebar = v; Theme.Watermark = v
