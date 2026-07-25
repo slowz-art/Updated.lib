@@ -1,6 +1,6 @@
 -- =====================================================================
 -- HollowLib v2.3 | Made by hollowoodz
--- Clean Blue Theme | Left Sidebar | Two Column Layout | Mobile Support
+-- Professional Clean Theme | Left Sidebar | Two Column Layout | Mobile Support
 -- Now with FULL 1up API + CUSTOM BACKGROUND TEXTURE support
 -- =====================================================================
 
@@ -94,50 +94,50 @@ if not env.Toggles then env.Toggles = setmetatable({}, {__index = function() ret
 if not env.Buttons then env.Buttons = {} end
 if not env.Labels then env.Labels = {} end
 
--- ===== THEME – No hardcoded red! =====
+-- ===== THEME – Refined Professional Palette =====
 local Theme = {
-    Background  = Color3.fromRGB(10, 10, 12),
-    Sidebar     = Color3.fromRGB(14, 14, 17),
-    GroupBG     = Color3.fromRGB(18, 18, 22),
-    GroupHeader = Color3.fromRGB(22, 22, 27),
-    ItemBG      = Color3.fromRGB(24, 24, 30),
-    Accent      = Color3.fromRGB(50, 150, 255),      -- Clean blue
-    AccentDark  = Color3.fromRGB(30, 100, 200),      -- Darker blue
-    Text        = Color3.fromRGB(240, 240, 240),
-    TextDim     = Color3.fromRGB(160, 160, 170),
-    TextDisabled= Color3.fromRGB(90, 90, 100),
-    Border      = Color3.fromRGB(35, 35, 42),
-    BorderBright= Color3.fromRGB(55, 55, 65),
-    Toggle      = Color3.fromRGB(30, 30, 38),
-    ToggleOn    = Color3.fromRGB(50, 150, 255),      -- Sync with Accent
-    SliderBG    = Color3.fromRGB(25, 25, 32),
-    SliderFill  = Color3.fromRGB(50, 150, 255),      -- Sync with Accent
-    DropBG      = Color3.fromRGB(20, 20, 26),
-    DropOpen    = Color3.fromRGB(16, 16, 20),
-    ScrollBar   = Color3.fromRGB(60, 60, 75),
-    TabActive   = Color3.fromRGB(50, 150, 255),      -- Sync with Accent
-    TabInactive = Color3.fromRGB(14, 14, 17),
-    TabHover    = Color3.fromRGB(30, 40, 60),
-    Watermark   = Color3.fromRGB(14, 14, 17),
+    Background  = Color3.fromRGB(10, 10, 14),
+    Sidebar     = Color3.fromRGB(14, 14, 20),
+    GroupBG     = Color3.fromRGB(18, 18, 26),
+    GroupHeader = Color3.fromRGB(22, 22, 32),
+    ItemBG      = Color3.fromRGB(24, 24, 34),
+    Accent      = Color3.fromRGB(60, 140, 255),      -- Clean vibrant blue
+    AccentDark  = Color3.fromRGB(40, 100, 210),
+    Text        = Color3.fromRGB(242, 242, 248),
+    TextDim     = Color3.fromRGB(160, 160, 175),
+    TextDisabled= Color3.fromRGB(90, 90, 105),
+    Border      = Color3.fromRGB(35, 35, 45),
+    BorderBright= Color3.fromRGB(55, 55, 68),
+    Toggle      = Color3.fromRGB(30, 30, 40),
+    ToggleOn    = Color3.fromRGB(60, 140, 255),
+    SliderBG    = Color3.fromRGB(25, 25, 36),
+    SliderFill  = Color3.fromRGB(60, 140, 255),
+    DropBG      = Color3.fromRGB(20, 20, 30),
+    DropOpen    = Color3.fromRGB(16, 16, 24),
+    ScrollBar   = Color3.fromRGB(60, 60, 80),
+    TabActive   = Color3.fromRGB(60, 140, 255),
+    TabInactive = Color3.fromRGB(14, 14, 20),
+    TabHover    = Color3.fromRGB(28, 38, 60),
+    Watermark   = Color3.fromRGB(14, 14, 20),
 }
 
--- ===== SPACING (more generous for clean look) =====
+-- ===== SPACING – More Airy for a Premium Feel =====
 local Radius = {
-    Window  = 14,
-    Group   = 12,
-    Item    = 10,
-    Button  = 10,
-    Toggle  = 10,
-    Small   = 8,
+    Window  = 12,
+    Group   = 10,
+    Item    = 8,
+    Button  = 8,
+    Toggle  = 8,
+    Small   = 6,
     Pill    = 14,
     Dot     = 3,
 }
 
 local PADDING = {
-    GroupPadding = 12,
-    ItemPadding = 10,
-    ListSpacing = 8,
-    SidePadding = 12,
+    GroupPadding = 14,
+    ItemPadding = 12,
+    ListSpacing = 10,
+    SidePadding = 14,
 }
 
 local function Tween(obj, props, t, style, dir)
@@ -282,8 +282,7 @@ function HollowLib:CreateWindow(config)
     
     local winWidth = config.Width or 420
     local winHeight = config.Height or 520
-    local showLogo = config.ShowLogo
-    if showLogo == nil then showLogo = true end
+    local showLogo = false  -- LOGO REMOVED – always false
     local titleType = config.TitleType or "static"
     local words = config.Words or {"Welcome"}
     
@@ -309,7 +308,7 @@ function HollowLib:CreateWindow(config)
 
     local Main = MakeFrame(ScreenGui, UDim2.new(0,curW,0,curH), UDim2.new(0.5,-curW/2,0.5,-curH/2), Theme.Background)
     Main.Name = "HollowWindow" Main.ClipsDescendants = true
-    Main.BackgroundTransparency = 0.15
+    Main.BackgroundTransparency = 0.12
     MakeCorner(Main, Radius.Window) MakeStroke(Main, Theme.Border, 1)
 
     -- ===== BACKGROUND IMAGE WITH FULL TEXTURE SUPPORT =====
@@ -318,7 +317,7 @@ function HollowLib:CreateWindow(config)
     BGImage.Size = UDim2.new(1,0,1,0)
     BGImage.Position = UDim2.new(0,0,0,0)
     BGImage.BackgroundColor3 = bgColor
-    BGImage.BackgroundTransparency = 1  -- Keep transparent background
+    BGImage.BackgroundTransparency = 1
     BGImage.ImageTransparency = bgTransparency
     BGImage.ScaleType = Enum.ScaleType.Crop
     BGImage.ZIndex = 0
@@ -345,8 +344,9 @@ function HollowLib:CreateWindow(config)
     Shadow.Position = UDim2.new(0,-20,0,-20) Shadow.BackgroundTransparency = 1
     Shadow.ZIndex = -1 Shadow.Parent = ShadowHolder
 
+    -- Topbar – refined with subtle gradient effect
     local Topbar = Instance.new("Frame")
-    Topbar.Size = UDim2.new(1,0,0,34)
+    Topbar.Size = UDim2.new(1,0,0,38)  -- Slightly taller for premium look
     Topbar.Position = UDim2.new(0,0,0,0)
     Topbar.BackgroundColor3 = Theme.Sidebar
     Topbar.BackgroundTransparency = 1
@@ -357,27 +357,14 @@ function HollowLib:CreateWindow(config)
     TopbarFill.Size = UDim2.new(1,0,0.5,0)
     TopbarFill.Position = UDim2.new(0,0,0.5,0)
     TopbarFill.BackgroundColor3 = Theme.Sidebar
-    TopbarFill.BackgroundTransparency = 1
+    TopbarFill.BackgroundTransparency = 0.6  -- slight transparency for modern glass effect
     TopbarFill.BorderSizePixel = 0
     TopbarFill.Parent = Topbar
 
-    local LogoImg = nil
-    if showLogo then
-        LogoImg = Instance.new("ImageLabel")
-        LogoImg.Name = "Logo"
-        LogoImg.Image = config.Logo or "rbxassetid://87465223885645"
-        LogoImg.Size = UDim2.new(0,50,0,50)
-        LogoImg.Position = UDim2.new(0,2,0.5,-25)
-        LogoImg.BackgroundTransparency = 1
-        LogoImg.BorderSizePixel = 0
-        LogoImg.ScaleType = Enum.ScaleType.Fit
-        LogoImg.ZIndex = 5
-        LogoImg.Parent = Topbar
-    end
-
+    -- Logo REMOVED – Title now spans full width with left padding
     local TitleContainer = Instance.new("Frame")
-    TitleContainer.Size = UDim2.new(1, (showLogo and -100 or -20), 1, 0)
-    TitleContainer.Position = UDim2.new(showLogo and 0.5 or 0, showLogo and 54 or 10, 0, 0)
+    TitleContainer.Size = UDim2.new(1, -20, 1, 0)  -- Full width minus padding
+    TitleContainer.Position = UDim2.new(0, 12, 0, 0)
     TitleContainer.BackgroundTransparency = 1
     TitleContainer.ClipsDescendants = true
     TitleContainer.Parent = Topbar
@@ -439,12 +426,13 @@ function HollowLib:CreateWindow(config)
         TitleLabel.Text = config.Title or "HollowLib"
         TitleLabel.TextColor3 = Theme.Text
         TitleLabel.Font = Enum.Font.GothamBold
-        TitleLabel.TextSize = 14
+        TitleLabel.TextSize = 15
         TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
         TitleLabel.TextYAlignment = Enum.TextYAlignment.Center
         TitleLabel.Parent = TitleContainer
     end
 
+    -- Topbar buttons (minimize, close, etc.) – keep as is but adjust offset
     local topBtnOffset = -30
     local function makeTopBtn(sym, color, cb)
         local b = MakeButton(Topbar, UDim2.new(0,26,0,26), UDim2.new(1,topBtnOffset,0.5,-13), Theme.Sidebar)
@@ -463,8 +451,8 @@ function HollowLib:CreateWindow(config)
     local minBtn, minLabel = makeTopBtn("─", Theme.TextDim, function()
         minimized = not minimized
         if minimized then
-            Main.Size = UDim2.new(0, curW, 0, 34)
-            Main.Position = UDim2.new(0.5, -curW/2, 0.5, -17)
+            Main.Size = UDim2.new(0, curW, 0, 38)
+            Main.Position = UDim2.new(0.5, -curW/2, 0.5, -19)
             Content.Visible = false
             ResizeHandle.Visible = false
             minLabel.Text = "□"
@@ -517,18 +505,18 @@ function HollowLib:CreateWindow(config)
 
     MakeDraggable(Topbar, Main, function() return uiLocked end)
 
-    local Content = MakeFrame(Main, UDim2.new(1,0,1,-34), UDim2.new(0,0,0,34), Theme.Background)
+    local Content = MakeFrame(Main, UDim2.new(1,0,1,-38), UDim2.new(0,0,0,38), Theme.Background)
     Content.Name = "HollowContent"
     Content.BackgroundTransparency = 1
     Content.ClipsDescendants = true
     MakeCorner(Content, Radius.Window)
 
-    local sideExpanded = 130
+    local sideExpanded = 140  -- Slightly wider for better readability
     local sideCollapsed = 42
     local sideOpen = true
 
     local Sidebar = MakeFrame(Content, UDim2.new(0,sideExpanded,1,0), nil, Theme.Sidebar)
-    Sidebar.BackgroundTransparency = 0.95
+    Sidebar.BackgroundTransparency = 0.92
     Sidebar.ClipsDescendants = true
     MakeCorner(Sidebar, Radius.Window)
     MakeStroke(Sidebar, Theme.Border, 1)
@@ -597,13 +585,14 @@ function HollowLib:CreateWindow(config)
     end
 
     local wmName = config.WatermarkName or "hollowoodz"
-    local Watermark = MakeFrame(ScreenGui, UDim2.new(0, isMobile and 220 or 240, 0, 28), UDim2.new(0,12,1,-40), Theme.Watermark)
-    Watermark.BackgroundTransparency = 0.3
+    local Watermark = MakeFrame(ScreenGui, UDim2.new(0, isMobile and 220 or 240, 0, 26), UDim2.new(0,12,1,-40), Theme.Watermark)
+    Watermark.BackgroundTransparency = 0.25
     MakeCorner(Watermark, 10)
     local WMStroke = MakeStroke(Watermark, Theme.Border, 1)
+    WMStroke.Transparency = 0.5
     MakeDraggable(Watermark, Watermark)
 
-    local WMBar = MakeFrame(Watermark, UDim2.new(0,3,0,16), UDim2.new(0,6,0.5,-8), Theme.Accent)
+    local WMBar = MakeFrame(Watermark, UDim2.new(0,3,0,14), UDim2.new(0,6,0.5,-7), Theme.Accent)
     MakeCorner(WMBar, 2)
 
     local WMName = MakeLabel(Watermark, wmName, 10, Theme.Text, Enum.Font.GothamBold)
@@ -806,7 +795,7 @@ function HollowLib:CreateWindow(config)
         end
 
         TabBtn.MouseEnter:Connect(function()
-            if not isActive then Tween(TabBtn, {BackgroundColor3=Color3.fromRGB(22,30,40)}, 0.2, Enum.EasingStyle.Quint) end
+            if not isActive then Tween(TabBtn, {BackgroundColor3=Color3.fromRGB(22,30,44)}, 0.2, Enum.EasingStyle.Quint) end
         end)
         TabBtn.MouseLeave:Connect(function()
             if not isActive then Tween(TabBtn, {BackgroundColor3=Theme.TabInactive}, 0.2, Enum.EasingStyle.Quint) end
@@ -826,28 +815,28 @@ function HollowLib:CreateWindow(config)
             else
                 GroupFrame = MakeFrame(col, UDim2.new(1,0,0,0), nil, Theme.GroupBG)
                 pcall(function() GroupFrame.AutomaticSize = Enum.AutomaticSize.Y end)
-                GroupFrame.BackgroundTransparency = 1
+                GroupFrame.BackgroundTransparency = 0.85  -- slight transparency for modern look
                 MakeCorner(GroupFrame, Radius.Group) MakeStroke(GroupFrame, Theme.Border, 1)
                 GroupFrame.ClipsDescendants = false
 
-                local Header = MakeFrame(GroupFrame, UDim2.new(1,0,0,32), nil, Theme.GroupHeader)
-                Header.BackgroundTransparency = 1
+                local Header = MakeFrame(GroupFrame, UDim2.new(1,0,0,34), nil, Theme.GroupHeader)
+                Header.BackgroundTransparency = 0.6
                 MakeCorner(Header, Radius.Group)
                 local HeaderFill = MakeFrame(Header, UDim2.new(1,0,0.5,0), UDim2.new(0,0,0.5,0), Theme.GroupHeader)
-                HeaderFill.BackgroundTransparency = 1
+                HeaderFill.BackgroundTransparency = 0.6
 
-                local AccentLine = MakeFrame(Header, UDim2.new(0,3,0,14), UDim2.new(0,10,0.5,-7), Theme.Accent)
+                local AccentLine = MakeFrame(Header, UDim2.new(0,3,0,16), UDim2.new(0,10,0.5,-8), Theme.Accent)
                 MakeCorner(AccentLine, 2)
 
-                local GroupTitle = MakeLabel(Header, name, 12, Theme.Text, Enum.Font.GothamBold)
+                local GroupTitle = MakeLabel(Header, name, 13, Theme.Text, Enum.Font.GothamBold)
                 GroupTitle.Size = UDim2.new(1,-20,1,0) GroupTitle.Position = UDim2.new(0,20,0,0)
                 GroupTitle.TextYAlignment = Enum.TextYAlignment.Center
 
-                ItemContainer = MakeFrame(GroupFrame, UDim2.new(1,0,0,0), UDim2.new(0,0,0,32), Theme.GroupBG)
+                ItemContainer = MakeFrame(GroupFrame, UDim2.new(1,0,0,0), UDim2.new(0,0,0,34), Theme.GroupBG)
                 pcall(function() ItemContainer.AutomaticSize = Enum.AutomaticSize.Y end)
                 ItemContainer.BackgroundTransparency = 1
                 MakeCorner(ItemContainer, Radius.Group) 
-                MakePadding(ItemContainer, 10, 12, 10, 10)
+                MakePadding(ItemContainer, 12, 14, 12, 12)
                 MakeList(ItemContainer, 8)
             end
 
@@ -886,24 +875,24 @@ function HollowLib:CreateWindow(config)
                 local state = cfg.Default or false
                 local callback = cfg.Callback or function() end
 
-                local Row = MakeFrame(ItemContainer, UDim2.new(1,0,0,28), nil, Theme.ItemBG)
+                local Row = MakeFrame(ItemContainer, UDim2.new(1,0,0,30), nil, Theme.ItemBG)
                 Row.BackgroundTransparency = 1
-                MakePadding(Row, 0, 0, 4, 4)
+                MakePadding(Row, 0, 0, 6, 6)
 
                 local RowBtn = MakeButton(Row, UDim2.new(1,0,1,0), nil, Theme.ItemBG)
                 RowBtn.BackgroundTransparency = 1
 
-                local CheckBox = MakeFrame(Row, UDim2.new(0,15,0,15), UDim2.new(0,0,0.5,-7), Theme.Toggle)
-                MakeCorner(CheckBox, 3)
+                local CheckBox = MakeFrame(Row, UDim2.new(0,16,0,16), UDim2.new(0,0,0.5,-8), Theme.Toggle)
+                MakeCorner(CheckBox, 4)
                 local CheckStroke = MakeStroke(CheckBox, Theme.Border, 1)
 
-                local CheckFill = MakeFrame(CheckBox, UDim2.new(0,9,0,9), UDim2.new(0.5,-4,0.5,-4), Theme.Accent)
-                MakeCorner(CheckFill, 2)
+                local CheckFill = MakeFrame(CheckBox, UDim2.new(0,10,0,10), UDim2.new(0.5,-5,0.5,-5), Theme.Accent)
+                MakeCorner(CheckFill, 3)
                 CheckFill.BackgroundTransparency = 1
 
                 local ToggleLabel = MakeLabel(Row, cfg.Text or id, 11, Theme.TextDim, Enum.Font.Gotham)
                 ToggleLabel.Size = UDim2.new(1,-24,1,0)
-                ToggleLabel.Position = UDim2.new(0,20,0,0)
+                ToggleLabel.Position = UDim2.new(0,22,0,0)
                 ToggleLabel.TextYAlignment = Enum.TextYAlignment.Center
 
                 local onChangedFn = nil
@@ -960,14 +949,14 @@ function HollowLib:CreateWindow(config)
                 local callback = cfg.Callback or function() end
                 local dragging = false
 
-                local Container = MakeFrame(ItemContainer, UDim2.new(1,0,0,34), nil, Theme.ItemBG)
+                local Container = MakeFrame(ItemContainer, UDim2.new(1,0,0,36), nil, Theme.ItemBG)
                 Container.BackgroundTransparency = 1
-                MakePadding(Container, 2, 2, 4, 4)
+                MakePadding(Container, 2, 2, 6, 6)
 
                 local SliderLabel = MakeLabel(Container, cfg.Text or id, 11, Theme.TextDim, Enum.Font.Gotham)
-                SliderLabel.Size = UDim2.new(1,0,0,12)
+                SliderLabel.Size = UDim2.new(1,0,0,14)
 
-                local SliderBG = MakeFrame(Container, UDim2.new(1,0,0,14), UDim2.new(0,0,0,16), Theme.SliderBG)
+                local SliderBG = MakeFrame(Container, UDim2.new(1,0,0,14), UDim2.new(0,0,0,18), Theme.SliderBG)
                 MakeCorner(SliderBG, 4)
 
                 local alpha = (value-min)/(max-min)
@@ -1082,7 +1071,7 @@ function HollowLib:CreateWindow(config)
                 local Container = MakeFrame(ItemContainer, UDim2.new(1,0,0,0), nil, Theme.ItemBG)
                 Container.BackgroundTransparency = 1
                 pcall(function() Container.AutomaticSize = Enum.AutomaticSize.Y end)
-                MakePadding(Container, 2, 4, 4, 4)
+                MakePadding(Container, 2, 4, 6, 6)
 
                 local Header = MakeButton(Container, UDim2.new(1,0,0,28), nil, Theme.DropBG)
                 Header.BackgroundTransparency = 1
@@ -1289,14 +1278,14 @@ function HollowLib:CreateWindow(config)
                 local callback = cfg.Callback or function() end
                 local pickerOpen = false
 
-                local Container = MakeFrame(ItemContainer, UDim2.new(1,0,0,28), nil, Theme.ItemBG)
+                local Container = MakeFrame(ItemContainer, UDim2.new(1,0,0,30), nil, Theme.ItemBG)
                 Container.BackgroundTransparency = 1
-                MakePadding(Container, 0, 0, 4, 4)
+                MakePadding(Container, 0, 0, 6, 6)
 
                 local PickerLabel = MakeLabel(Container, cfg.Title or id, 11, Theme.TextDim, Enum.Font.Gotham)
                 PickerLabel.Size = UDim2.new(1,-40,1,0) PickerLabel.TextYAlignment = Enum.TextYAlignment.Center
 
-                local ColorBtn = MakeButton(Container, UDim2.new(0,26,0,14), UDim2.new(1,-28,0.5,-7), color)
+                local ColorBtn = MakeButton(Container, UDim2.new(0,26,0,16), UDim2.new(1,-28,0.5,-8), color)
                 MakeCorner(ColorBtn, 4) MakeStroke(ColorBtn, Theme.BorderBright, 1)
 
                 local popupW, popupH = 200, 240
@@ -1824,9 +1813,9 @@ function HollowLib:CreateWindow(config)
     function Window:SetHideKey(key) hideKey = key end
     function Window:SetDisplayName(name) PlayerName.Text = name end
     function Window:SetUsername(name) end
-    function Window:SetLogo(textureId) if LogoImg then LogoImg.Image = "rbxassetid://"..tostring(textureId) end end
-    
-    -- ===== BACKGROUND METHODS – FIXED: no forced transparency =====
+    function Window:SetLogo(textureId) end  -- No-op since logo removed
+
+    -- ===== BACKGROUND METHODS =====
     function Window:SetBackground(textureId, transparency)
         local id = tostring(textureId)
         if tonumber(id) then id = "rbxassetid://" .. id end
@@ -1834,7 +1823,6 @@ function HollowLib:CreateWindow(config)
         if transparency ~= nil then 
             BGImage.ImageTransparency = transparency
         end
-        -- DO NOT force BackgroundTransparency or Visible – preserve user's setting
     end
     
     function Window:SetBackgroundColor(color)
@@ -1894,7 +1882,7 @@ local function GetDefaultGroup()
             ShowLogo = false,
             TitleType = "sliding",
             Words = {"1up Compatible", "HollowLib v2.3", "Full API Support"},
-            Accent = Color3.fromRGB(50, 150, 255),
+            Accent = Color3.fromRGB(60, 140, 255),
             HideKey = Enum.KeyCode.RightControl,
         })
         _defaultTab = _defaultWindow:AddTab("Main", "📁")
